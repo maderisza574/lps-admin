@@ -24,7 +24,7 @@ function Assignments() {
   const fetchAssignments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://lps-admin-nu.vercel.app/assignments', {
+      const response = await fetch('https://lsp-backend-zeta.vercel.app/assignments', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -49,7 +49,7 @@ function Assignments() {
   const fetchCustomers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://lps-admin-nu.vercel.app/customers', {
+      const response = await fetch('https://lsp-backend-zeta.vercel.app/customers', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -69,7 +69,7 @@ function Assignments() {
     try {
       const token = localStorage.getItem('token');
       // 🔧 UPDATE: Gunakan endpoint yang benar untuk agents
-      const response = await fetch('https://lps-admin-nu.vercel.app/users/agents', {
+      const response = await fetch('https://lsp-backend-zeta.vercel.app/users/agents', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -109,7 +109,7 @@ function Assignments() {
         return;
       }
 
-      const response = await fetch('https://lps-admin-nu.vercel.app/assignments', {
+      const response = await fetch('https://lsp-backend-zeta.vercel.app/assignments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

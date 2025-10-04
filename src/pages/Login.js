@@ -24,7 +24,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://lps-admin-nu.vercel.app/auth/login', {
+      const response = await fetch('https://lsp-backend-zeta.vercel.app/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
