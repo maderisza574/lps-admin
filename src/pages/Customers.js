@@ -24,7 +24,7 @@ function Customers() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/customers', {
+      const response = await fetch('https://lps-admin-nu.vercel.app/customers', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function Customers() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/customers', {
+      const response = await fetch('https://lps-admin-nu.vercel.app/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

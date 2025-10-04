@@ -45,7 +45,7 @@ function Users() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch('https://lps-admin-nu.vercel.app/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
