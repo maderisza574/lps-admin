@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../stores/authStore';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ ambil fungsi login dari AuthContext
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -38,18 +42,19 @@ function Login() {
       const data = await response.json();
 
       if (response.ok && data.data?.token) {
-        // Login berhasil - sesuaikan dengan struktur response
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify({
+        // Login berhasil
+        const userData = {
           id: data.data.user.id,
           email: data.data.user.email,
           username: data.data.user.email.split('@')[0],
           name: data.data.user.full_name,
           role: data.data.user.role
-        }));
+        };
+
+        // ✅ simpan ke context + localStorage
+        login(userData, data.data.token);
         navigate('/home');
       } else {
-        // Login gagal
         setError(data.message || 'Email atau password salah');
       }
     } catch (err) {
