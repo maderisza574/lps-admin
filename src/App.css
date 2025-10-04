@@ -1,38 +1,227 @@
-.App {
+/* src/App.css */
+:root {
+  --lps-primary: #DB8928;
+  --lps-primary-dark: #b56d1a;
+  --lps-primary-light: #f0a754;
+  --lps-secondary: #2c3e50;
+  --lps-light: #f8f9fa;
+  --lps-dark: #343a40;
+  --lps-sidebar: #2c3e50;
+  --lps-sidebar-hover: #34495e;
+}
+
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Custom colors untuk LPS Admin */
+.bg-primary {
+  background-color: var(--lps-primary) !important;
+}
+
+.bg-sidebar {
+  background-color: var(--lps-sidebar) !important;
+}
+
+.btn-primary {
+  background-color: var(--lps-primary);
+  border-color: var(--lps-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--lps-primary-dark);
+  border-color: var(--lps-primary-dark);
+}
+
+.text-primary {
+  color: var(--lps-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--lps-primary) !important;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  min-height: 100vh;
+  background: var(--lps-sidebar);
+  transition: all 0.3s;
+}
+
+.sidebar .nav-link {
+  color: #fff;
+  padding: 12px 20px;
+  margin: 5px 10px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+  background-color: var(--lps-sidebar-hover);
+  color: #fff;
+}
+
+.sidebar .nav-link.active {
+  background-color: var(--lps-primary);
+  color: #fff;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+  width: 20px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Main Content Area */
+.main-content {
+  background-color: #f5f6fa;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Header Styles */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Card Styles */
+.stat-card {
+  border-left: 4px solid var(--lps-primary);
+}
+
+.stat-card .card-body {
+  padding: 1.5rem;
+}
+
+/* Tambahkan di src/App.css */
+
+/* Custom styles untuk Customers page */
+.table th {
+  border-top: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.table td {
+  vertical-align: middle;
+  border-top: 1px solid #f1f3f4;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--lps-primary);
+  box-shadow: 0 0 0 0.2rem rgba(219, 137, 40, 0.25);
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Card improvements */
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.card-header {
+  border-bottom: 1px solid #f1f3f4;
+  padding: 1.25rem 1.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Badge custom */
+.badge {
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Tambahkan di src/App.css */
+
+/* Badge styles */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+}
+
+/* Table improvements */
+.table td {
+  vertical-align: middle;
+}
+
+/* Form select styling */
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem 1rem;
+}
+
+.form-select:focus {
+  border-color: var(--lps-primary);
+  box-shadow: 0 0 0 0.2rem rgba(219, 137, 40, 0.25);
+}
+
+/* Card header improvements */
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Tambahkan di src/App.css */
+
+/* Badge styles untuk assignments */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+}
+
+/* Table improvements */
+.table th {
+  border-top: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.table td {
+  vertical-align: middle;
+  border-top: 1px solid #f1f3f4;
 }
