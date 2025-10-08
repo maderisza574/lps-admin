@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert, Table, Badge, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert, Table, Badge, Spinner, Modal } from 'react-bootstrap';
 import Layout from '../components/common/Layout';
 
 function Assignments() {
@@ -28,6 +28,18 @@ function Assignments() {
     const [loadingAssignments, setLoadingAssignments] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [agents, setAgents] = useState([]);
+    
+    // State untuk modal review
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [selectedAssignment, setSelectedAssignment] = useState(null);
+    const [reviewNote, setReviewNote] = useState('');
+    const [reviewAction, setReviewAction] = useState('approve');
+    const [reviewLoading, setReviewLoading] = useState(false);
+    
+    // State untuk modal detail
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [assignmentDetail, setAssignmentDetail] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(false);
 
     // Fetch assignments, customers, and agents on component mount
     useEffect(() => {
@@ -103,7 +115,7 @@ function Assignments() {
             setMessage({ type: 'warning', text: 'Tidak dapat mengambil data agents' });
         }
     };
-    
+
     // --- Handler Functions ---
 
     const handleChange = (e) => {
@@ -181,6 +193,85 @@ function Assignments() {
             setLoading(false);
         }
     };
+
+    // --- Review Functions ---
+
+    const handleShowReviewModal = (assignment, action) => {
+        setSelectedAssignment(assignment);
+        setReviewAction(action);
+        setReviewNote('');
+        setShowReviewModal(true);
+    };
+
+    const handleReviewSubmit = async () => {
+        if (!selectedAssignment) return;
+
+        setReviewLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`https://lsp-backend-zeta.vercel.app/assignments/${selectedAssignment.id}/review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    action: reviewAction,
+                    note: reviewNote
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setMessage({ type: 'success', text: `Assignment berhasil di${reviewAction === 'approve' ? 'setujui' : 'tolak'}!` });
+                setShowReviewModal(false);
+                await fetchAssignments(); // Refresh data
+            } else {
+                setMessage({ type: 'danger', text: data.message || `Gagal melakukan ${reviewAction}` });
+            }
+        } catch (err) {
+            console.error('Review assignment error:', err);
+            setMessage({ type: 'danger', text: 'Terjadi kesalahan saat melakukan review' });
+        } finally {
+            setReviewLoading(false);
+        }
+    };
+
+    // --- Detail Functions ---
+
+    const handleShowDetailModal = async (assignmentId) => {
+        setDetailLoading(true);
+        setShowDetailModal(true);
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`https://lsp-backend-zeta.vercel.app/assignments/${assignmentId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setAssignmentDetail(data.data || data);
+            } else {
+                setMessage({ type: 'danger', text: data.message || 'Gagal mengambil detail assignment' });
+            }
+        } catch (err) {
+            console.error('Fetch assignment detail error:', err);
+            setMessage({ type: 'danger', text: 'Terjadi kesalahan saat mengambil detail assignment' });
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
+    const handleCloseDetailModal = () => {
+        setShowDetailModal(false);
+        setAssignmentDetail(null);
+    };
     
     // --- Helper Functions ---
     
@@ -219,6 +310,15 @@ function Assignments() {
             hour: '2-digit',
             minute: '2-digit'
         });
+    };
+
+    const formatCurrency = (amount) => {
+        if (!amount) return '-';
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(amount);
     };
 
     // --- Component Render ---
@@ -419,7 +519,7 @@ function Assignments() {
                             </Card.Body>
                         </Card>
 
-                        {/* Quick Stats & Agents Info (TETAP SAMA) */}
+                        {/* Quick Stats & Agents Info */}
                         <Row className="mt-4">
                             <Col md={6}>
                                 <Card className="border-primary">
@@ -465,7 +565,7 @@ function Assignments() {
 
                     </Col>
 
-                    {/* Assignments List (PERBAIKAN di bagian ID) */}
+                    {/* Assignments List */}
                     <Col lg={7}>
                         <Card className="shadow-sm">
                             <Card.Header className="bg-white d-flex justify-content-between align-items-center">
@@ -493,7 +593,7 @@ function Assignments() {
                                                     <th>Agent</th>
                                                     <th>Status</th>
                                                     <th>Created</th>
-                                                    <th>Action</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -532,15 +632,42 @@ function Assignments() {
                                                             </small>
                                                         </td>
                                                         <td>
-                                                            <Button variant="outline-primary" size="sm" className="me-1">
-                                                                View Detail
-                                                            </Button>
-                                                            {/* Delete button hanya muncul jika status masih pending/initial */}
-                                                            {assignment.status === 'pending' && (
-                                                                <Button variant="outline-danger" size="sm">
-                                                                    Delete
+                                                            <div className="d-flex gap-1">
+                                                                <Button 
+                                                                    variant="outline-primary" 
+                                                                    size="sm" 
+                                                                    onClick={() => handleShowDetailModal(assignment.id)}
+                                                                >
+                                                                    View Detail
                                                                 </Button>
-                                                            )}
+                                                                
+                                                                {/* Approve/Reject buttons hanya muncul jika status submitted */}
+                                                                {assignment.status === 'submitted' && (
+                                                                    <>
+                                                                        <Button 
+                                                                            variant="outline-success" 
+                                                                            size="sm"
+                                                                            onClick={() => handleShowReviewModal(assignment, 'approve')}
+                                                                        >
+                                                                            Approve
+                                                                        </Button>
+                                                                        <Button 
+                                                                            variant="outline-danger" 
+                                                                            size="sm"
+                                                                            onClick={() => handleShowReviewModal(assignment, 'reject')}
+                                                                        >
+                                                                            Reject
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                                
+                                                                {/* Delete button hanya muncul jika status masih pending/initial */}
+                                                                {assignment.status === 'pending' && (
+                                                                    <Button variant="outline-danger" size="sm">
+                                                                        Delete
+                                                                    </Button>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -570,6 +697,127 @@ function Assignments() {
                         </Card>
                     </Col>
                 </Row>
+
+                {/* Review Modal */}
+                <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            {reviewAction === 'approve' ? 'Approve Assignment' : 'Reject Assignment'}
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group className="mb-3">
+                            <Form.Label>
+                                Catatan {reviewAction === 'approve' ? 'Persetujuan' : 'Penolakan'}:
+                            </Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                value={reviewNote}
+                                onChange={(e) => setReviewNote(e.target.value)}
+                                placeholder={
+                                    reviewAction === 'approve' 
+                                        ? "Masukkan catatan persetujuan (opsional)"
+                                        : "Masukkan alasan penolakan"
+                                }
+                            />
+                        </Form.Group>
+                        {selectedAssignment && (
+                            <div className="alert alert-info">
+                                <strong>Assignment:</strong> {selectedAssignment.nama_lengkap || getCustomerName(selectedAssignment.customer_id)}
+                                <br />
+                                <strong>Agent:</strong> {getAgentName(selectedAssignment.agent_id)}
+                            </div>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button 
+                            variant="secondary" 
+                            onClick={() => setShowReviewModal(false)}
+                            disabled={reviewLoading}
+                        >
+                            Batal
+                        </Button>
+                        <Button 
+                            variant={reviewAction === 'approve' ? 'success' : 'danger'}
+                            onClick={handleReviewSubmit}
+                            disabled={reviewLoading || (reviewAction === 'reject' && !reviewNote.trim())}
+                        >
+                            {reviewLoading ? (
+                                <>
+                                    <Spinner animation="border" size="sm" className="me-2" />
+                                    Processing...
+                                </>
+                            ) : (
+                                reviewAction === 'approve' ? 'Approve' : 'Reject'
+                            )}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                {/* Detail Modal */}
+                <Modal show={showDetailModal} onHide={handleCloseDetailModal} size="lg">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Assignment Detail</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {detailLoading ? (
+                            <div className="text-center py-4">
+                                <Spinner animation="border" variant="primary" />
+                                <p className="mt-2 text-muted">Loading detail assignment...</p>
+                            </div>
+                        ) : assignmentDetail ? (
+                            <div>
+                                <Row>
+                                    <Col md={6}>
+                                        <h6 className="text-muted">Customer Information</h6>
+                                        <p><strong>Nama Lengkap:</strong> {assignmentDetail.nama_lengkap}</p>
+                                        <p><strong>Jenis Identitas:</strong> {assignmentDetail.jenis_identitas}</p>
+                                        <p><strong>No. Identitas:</strong> {assignmentDetail.no_identitas}</p>
+                                        <p><strong>Jenis Kelamin:</strong> {assignmentDetail.jenis_kelamin}</p>
+                                        <p><strong>Tempat Lahir:</strong> {assignmentDetail.tempat_lahir || '-'}</p>
+                                        <p><strong>Tanggal Lahir:</strong> {assignmentDetail.tanggal_lahir ? formatDate(assignmentDetail.tanggal_lahir) : '-'}</p>
+                                        <p><strong>Alamat:</strong> {assignmentDetail.alamat}</p>
+                                        <p><strong>No. Telepon:</strong> {assignmentDetail.no_telepon || '-'}</p>
+                                    </Col>
+                                    <Col md={6}>
+                                        <h6 className="text-muted">Assignment Information</h6>
+                                        <p><strong>Status:</strong> {getStatusBadge(assignmentDetail.status)}</p>
+                                        <p><strong>Agent:</strong> {getAgentName(assignmentDetail.agent_id)}</p>
+                                        <p><strong>Dibuat:</strong> {formatDate(assignmentDetail.created_at)}</p>
+                                        <p><strong>Diupdate:</strong> {formatDate(assignmentDetail.updated_at)}</p>
+                                        
+                                        <h6 className="text-muted mt-3">Financial Information</h6>
+                                        <p><strong>Total Simpanan:</strong> {formatCurrency(assignmentDetail.total_simpanan)}</p>
+                                        <p><strong>Status Layak Bayar:</strong> {assignmentDetail.status_layak_bayar}</p>
+                                        <p><strong>Nominal Layak Bayar:</strong> {formatCurrency(assignmentDetail.nominal_layak_bayar)}</p>
+                                        <p><strong>Batas Akhir Pengajuan:</strong> {assignmentDetail.batas_akhir_pengajuan ? formatDate(assignmentDetail.batas_akhir_pengajuan) : '-'}</p>
+                                        
+                                        <h6 className="text-muted mt-3">Bank Information</h6>
+                                        <p><strong>Nama Bank:</strong> {assignmentDetail.nama_bank}</p>
+                                        <p><strong>No. CIF:</strong> {assignmentDetail.no_cif}</p>
+                                    </Col>
+                                </Row>
+                                
+                                {assignmentDetail.note && (
+                                    <div className="mt-3 p-3 bg-light rounded">
+                                        <h6>Catatan:</h6>
+                                        <p className="mb-0">{assignmentDetail.note}</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-center py-4">
+                                <p className="text-muted">Tidak dapat memuat detail assignment</p>
+                            </div>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseDetailModal}>
+                            Tutup
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </Container>
         </Layout>
     );
