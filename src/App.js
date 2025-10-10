@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Users from './pages/Users';
 import Customers from './pages/Customers';
 import Assignments from './pages/Assignments';
+import Approver from './pages/Approver'; // IMPORT BARU
 import './App.css';
 
 // Protected Route Component
@@ -53,6 +54,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Assignments />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/approver" 
+              element={
+                <ProtectedRoute>
+                  <Approver />
                 </ProtectedRoute>
               } 
             />

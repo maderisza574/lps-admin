@@ -7,12 +7,13 @@ function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-const menuItems = [
-  { path: '/home', label: 'Dashboard', icon: '📊' },
-  { path: '/users', label: 'Create User', icon: '👥' },
-  { path: '/customers', label: 'Create Customer', icon: '👨‍💼' },
-  { path: '/assignments', label: 'Assignments', icon: '📋' }, // Tambahkan menu ini
-];
+  const menuItems = [
+    { path: '/home', label: 'Dashboard', icon: '📊' },
+    { path: '/users', label: 'Create User', icon: '👥' },
+    { path: '/customers', label: 'Create Customer', icon: '👨‍💼' },
+    { path: '/assignments', label: 'Assignments', icon: '📋' },
+    { path: '/approver', label: 'Approver', icon: '✅' }, // Menu baru untuk Approver
+  ];
 
   const handleNavigate = (path) => {
     navigate(path);
